@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Language Translator</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#f4f4f4;
+    display:flex;
+    justify-content:center;
+}
+
+.container{
+    width:500px;
+    background:white;
+    padding:20px;
+    margin-top:40px;
+    border-radius:8px;
+    box-shadow:0 0 10px gray;
+}
+
+textarea{
+    width:100%;
+    height:120px;
+}
+
+select,button{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+}
+
+#result{
+    margin-top:20px;
+    padding:10px;
+    border:1px solid gray;
+    min-height:60px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h2>Language Translation Tool</h2>
+
+<textarea id="text" placeholder="Enter text"></textarea>
+
+<select id="source">
+    <option value="en">English</option>
+    <option value="hi">Hindi</option>
+    <option value="fr">French</option>
+    <option value="es">Spanish</option>
+</select>
+
+<select id="target">
+    <option value="hi">Hindi</option>
+    <option value="en">English</option>
+    <option value="fr">French</option>
+    <option value="es">Spanish</option>
+</select>
+
+<button onclick="translateText()">Translate</button>
+
+<h3>Translated Text</h3>
+
+<div id="result"></div>
+
+<button onclick="copyText()">Copy</button>
+<button onclick="speakText()">Speak</button>
+
+</div>
+
+<script>
+
+const API_KEY="YOUR_GOOGLE_API_KEY";
+
+async function translateText(){
+
+let text=document.getElementById("text").value;
+let source=document.getElementById("source").value;
+let target=document.getElementById("target").value;
+
+const response=await fetch(
+`https://translation.googleapis.com/language/translate/v2?key=${API_KEY}`,
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+q:text,
+source:source,
+target:target,
+format:"text"
+
+})
+
+});
+
+const data=await response.json();
+
+document.getElementById("result").innerHTML=
+data.data.translations[0].translatedText;
+
+}
+
+function copyText(){
+
+navigator.clipboard.writeText(
+document.getElementById("result").innerText
+);
+
+alert("Copied!");
+
+}
+
+function speakText(){
+
+let speech=new SpeechSynthesisUtterance(
+document.getElementById("result").innerText
+);
+
+speech.lang=document.getElementById("target").value;
+
+speechSynthesis.speak(speech);
+
+}
+
+</script>
+
+</body>
+</html>
